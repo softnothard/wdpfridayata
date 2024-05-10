@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock Paper Scissors Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="button-container">
+        <h2>Welcome to Rock Paper Scissors Game!</h2>
+        <button id="humanBtn"><img src="human.png" alt="HUMAN"></button>
+        <button id="computerBtn"><img src="computer.png" alt="COMPUTER"></button>
+    </div>
+    <button id="exitBtn">Exit</button>
+
+    <div class="score-container">
+        <!-- Display player names and scores -->
+        <h2>Game Score</h2>
+        <p><span id="player1-name"></span>: <span id="player1-score">0</span></p>
+        <p><span id="player2-name"></span>: <span id="player2-score">0</span></p>
+    </div>
+
+    <div class="score-container">
+        <!-- Display player choices -->
+        <p><span id="player1-choice">Player 1:</span></p>
+        <p><span id="player2-choice">Player 2:</span></p>
+    </div>
+
+    <div class="button-container">
+        <!-- Display buttons for player choices -->
+        <button id="rockBtn"><img src="rock.png" alt="Rock"></button>
+        <button id="paperBtn"><img src="paper.png" alt="Paper"></button>
+        <button id="scissorsBtn"><img src="scissors.png" alt="Scissors"></button>
+    </div>
+
+    <script>
+        let roundsToWin = 5;
+        let player1Score = 0;
+        let player2Score = 0;
+
+        // Function to start the game
+        function startGame(opponent) {
+            const player1 = prompt("Enter your name:");
+            const player2 = (opponent === 'player') ? prompt("Enter opponent's name:") : "Computer";
+            document.getElementById('player1-name').textContent = player1;
+            document.getElementById('player2-name').textContent = player2;
+
+            if (opponent === 'player') {
+                document.getElementById('rockBtn').addEventListener('click', function() {
+                    play('rock', 'player');
+                });
+                document.getElementById('paperBtn').addEventListener('click', function() {
+                    play('paper', 'player');
+                });
+                document.getElementById('scissorsBtn').addEventListener('click', function() {
+                    play('scissors', 'player');
+                });
+            } else {
+                // Reset event listeners
+                document.getElementById('rockBtn').removeEventListener('click', play);
+                document.getElementById('paperBtn').removeEventListener('click', play);
+                document.getElementById('scissorsBtn').removeEventListener('click', play);
+                
+                // Set event listeners for player against computer mode
+                document.getElementById('rockBtn').addEventListener('click', function() {
+                    play('rock', 'ai');
+                });
+                document.getElementById('paperBtn').addEventListener('click', function() {
+                    play('paper', 'ai');
+                });
+                document.getElementById('scissorsBtn').addEventListener('click', function() {
+                    play('scissors', 'ai');
+                });
+            }
+        }
+
+        // Function to exit the game
+        function exit() {
+            window.close();
+        }
+
+        // Function to determine winner and check for end of game
+        function play(playerChoice, playerType) {
+            const player1Choice = playerChoice;
+            let player2Choice;
+
+            if (playerType === 'ai') {
+                player2Choice = getRandomChoice();
+            } else {
+                player2Choice = prompt("Enter Player 2's choice (rock, paper, or scissors):");
+                if (player2Choice !== 'rock' && player2Choice !== 'paper' && player2Choice !== 'scissors') {
+                    alert("Invalid choice. Please enter rock, paper, or scissors.");
+                    return;
+                }
+            }
+
+            // Update player choices display
+            document.getElementById('player1-choice').textContent = player1Choice;
+            document.getElementById('player2-choice').textContent = player2Choice;
+
+            // Logic to determine winner
+            if (player1Choice === player2Choice) {
+                // It's a tie
+                alert("It's a tie! Replay the game.");
+            } else if (
+                (player1Choice === 'rock' && player2Choice === 'scissors') ||
+                (player1Choice === 'scissors' && player2Choice === 'paper') ||
+                (player1Choice === 'paper' && player2Choice === 'rock')
+            ) {
+                // Player 1 wins
+                player1Score++;
+                document.getElementById('player1-score').textContent = player1Score;
+                if (player1Score >= roundsToWin) {
+                    congratulatePlayer(document.getElementById('player1-name').textContent);
+                }
+            } else {
+                // Player 2 wins
+                player2Score++;
+                document.getElementById('player2-score').textContent = player2Score;
+                if (player2Score >= roundsToWin) {
+                    congratulatePlayer(document.getElementById('player2-name').textContent);
+                }
+            }
+        }
+
+        // Function to generate random choice for AI
+        function getRandomChoice() {
+            const choices = ['rock', 'paper', 'scissors'];
+            return choices[Math.floor(Math.random() * choices.length)];
+        }
+
+        // Function to congratulate the player
+        function congratulatePlayer(playerName) {
+            if (confirm(`${playerName} wins the game! Do you want to play again?`)) {
+                resetGame();
+            } else {
+                exit();
+            }
+        }
+
+        // Function to reset the game
+        function resetGame() {
+            player1Score = 0;
+            player2Score = 0;
+            document.getElementById('player1-score').textContent = player1Score;
+            document.getElementById('player2-score').textContent = player2Score;
+            document.getElementById('player1-choice').textContent = '';
+            document.getElementById('player2-choice').textContent = '';
+        }
+
+        // Function to add event listeners to buttons
+        function addEventListeners() {
+            document.getElementById('humanBtn').addEventListener('click', function() {
+                const rounds = parseInt(prompt("Enter the number of rounds to win:"));
+                roundsToWin = rounds;
+                startGame('player');
+            });
+            document.getElementById('computerBtn').addEventListener('click', function() {
+                const rounds = parseInt(prompt("Enter the number of rounds to win:"));
+                roundsToWin = rounds;
+                startGame('ai');
+            });
+            document.getElementById('exitBtn').addEventListener('click', exit);
+        }
+
+        // Call the function to add event listeners when the page loads
+        window.onload = addEventListeners;
+    </script>
+</body>
+</html>
